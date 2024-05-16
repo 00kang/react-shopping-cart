@@ -17,26 +17,30 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: "npm"
+
       - name: Install dependencies
         run: npm install
+
       - name: Build
         run: npm run build
         env:
           VITE_BASE_URL: ${{ secrets.VITE_BASE_URL }}
           VITE_USER_ID: ${{ secrets.VITE_USER_ID }}
           VITE_USER_PASSWORD: ${{ secrets.VITE_USER_PASSWORD }}
+
       - name: Build storybook
         run: |
           npm run build-storybook
           mv ./storybook-static ./dist/storybook
+
       - name: Deploy to gh-pages branch
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.TOKEN }}
           publish_dir: ./dist
