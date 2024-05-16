@@ -21,12 +21,12 @@ export const CartItemCardList: React.FC = () => {
   useEffect(() => {
     const allSelected = cartItems.every((item) => selectedItems[item.id]);
     setIsAllSelected(allSelected);
-  }, [cartItems, selectedItems, setIsAllSelected]);
+  }, [setIsAllSelected]);
 
   useEffect(() => {
     localStorage.setItem("selectedItemsState", JSON.stringify(selectedItems));
     localStorage.setItem("isAllSelectedState", JSON.stringify(isAllSelected));
-  }, [selectedItems, isAllSelected]);
+  }, []);
 
   const handleSelectAll = () => {
     const newSelectedItems: Record<number, boolean> = {};
