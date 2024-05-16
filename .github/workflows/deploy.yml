@@ -30,7 +30,7 @@ jobs:
         env:
           VITE_BASE_URL: ${{ secrets.VITE_BASE_URL }}
           VITE_USER_ID: ${{ secrets.VITE_USER_ID }}
-          VITE_USER_PASSWORD: ${{ secrets.VITE_PASSWORD }}
+          VITE_USER_PASSWORD: ${{ secrets.VITE_USER_PASSWORD }}
       - name: Build storybook
         run: |
           npm run build-storybook
