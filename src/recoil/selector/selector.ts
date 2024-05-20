@@ -1,39 +1,34 @@
 import { selector } from "recoil";
-import { cartItemsState } from "../atoms/atoms";
+import { DELIVERY } from "../../constants";
+import { CartSummary } from "../../types";
+import { cartItemsState, checkedItemState } from "../atoms/atoms";
 
-export const categoryCountState = selector<number>({
-  key: "categoryCountState",
+export const cartSummarySelectorState = selector<CartSummary>({
+  key: "cartSummarySelectorState",
   get: ({ get }) => {
     const cartItems = get(cartItemsState);
-    return cartItems.length;
-  },
-});
+    const checkedItems = get(checkedItemState);
 
-export const orderPriceState = selector<number>({
-  key: "orderPriceState",
-  get: ({ get }) => {
-    const cartItems = get(cartItemsState);
-    const orderPrice = cartItems.reduce((total, item) => {
-      return total + item.product.price * item.quantity;
-    }, 0);
-    return orderPrice;
-  },
-});
+    const checkedCartItems = cartItems.filter((item) => checkedItems[item.id]);
 
-export const deliveryPriceState = selector<number>({
-  key: "deliveryPriceState",
-  get: ({ get }) => {
-    const orderPrice = get(orderPriceState);
-    const deliveryPrice = orderPrice > 100000 ? 0 : 3000;
-    return deliveryPrice;
-  },
-});
+    const orderPrice = checkedCartItems.reduce(
+      (total, item) => total + item.product.price * item.quantity,
+      0
+    );
+    const deliveryPrice =
+      orderPrice === 0 || orderPrice >= DELIVERY.FREE_THRESHOLD ? DELIVERY.FREE : DELIVERY.STANDARD;
+    const totalPrice = orderPrice + deliveryPrice;
 
-export const totalPriceState = selector<number>({
-  key: "totalPriceState",
-  get: ({ get }) => {
-    const orderPrice = get(orderPriceState);
-    const deliveryPrice = get(deliveryPriceState);
-    return orderPrice + deliveryPrice;
+    const uniqueItemCount = checkedCartItems.length;
+    const totalItemCount = checkedCartItems.reduce((total, item) => total + item.quantity, 0);
+
+    return {
+      cartItems,
+      orderPrice,
+      deliveryPrice,
+      totalPrice,
+      uniqueItemCount,
+      totalItemCount,
+    };
   },
 });

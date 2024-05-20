@@ -1,8 +1,9 @@
-import { useSetRecoilState } from "recoil";
-import { deleteCartItem, patchCartItemQuantityChange } from "../../api";
-import { cartItemsState } from "../../recoil/atoms/atoms";
+import { COUNTER_BUTTON_TYPES } from "../../constants";
+import { useDecreaseCartItemQuantity } from "../../hooks/useDecreaseCartItemQuantity";
+import { useDeleteCartItem } from "../../hooks/useDeleteCartItem";
+import { useIncreaseCartItemQuantity } from "../../hooks/useIncreaseCartItemQuantity";
 import { CartItem } from "../../types";
-import { ActionButton } from "../button/actionButton/ActionButton";
+import { CheckboxButton, CounterButton, DeleteButton } from "../button";
 import {
   StyledCartItemCard,
   StyledCartItemCardHeader,
@@ -15,67 +16,27 @@ import {
   StyledProductQuantityText,
 } from "./CartItemCard.styled";
 interface CartItemProps extends CartItem {
-  selected: boolean;
-  onSelect: () => void;
+  isChecked: boolean;
+  onCheck: () => void;
 }
 export const CartItemCard: React.FC<CartItemProps> = ({
   id,
   product,
   quantity,
-  selected,
-  onSelect,
+  isChecked,
+  onCheck,
 }) => {
   const { name, price, imageUrl } = product;
-  const setCartItems = useSetRecoilState(cartItemsState);
 
-  const handleItemDelete = async (id: number) => {
-    try {
-      await deleteCartItem(id);
-      setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-    } catch (error) {
-      console.error("Failed to delete cart item:", error);
-    }
-  };
-
-  const handleItemCountPlus = async (id: number) => {
-    try {
-      const newQuantity = quantity + 1;
-      await patchCartItemQuantityChange(id, newQuantity);
-      setCartItems((prevItems) =>
-        prevItems.map((item) =>
-          item.id === id ? { ...item, quantity: newQuantity } : item
-        )
-      );
-    } catch (error) {
-      console.error("Failed to increase item quantity:", error);
-    }
-  };
-
-  const handleItemCountMinus = async (id: number) => {
-    if (quantity > 1) {
-      try {
-        const newQuantity = quantity - 1;
-        await patchCartItemQuantityChange(id, newQuantity);
-        setCartItems((prevItems) =>
-          prevItems.map((item) =>
-            item.id === id ? { ...item, quantity: newQuantity } : item
-          )
-        );
-      } catch (error) {
-        console.error("Failed to decrease item quantity:", error);
-      }
-    }
-  };
+  const handleItemDelete = useDeleteCartItem();
+  const handleItemCountPlus = useIncreaseCartItemQuantity();
+  const handleItemCountMinus = useDecreaseCartItemQuantity();
 
   return (
     <StyledCartItemCard>
       <StyledCartItemCardHeader>
-        <ActionButton type="select" clicked={selected} onSelect={onSelect} />
-        <ActionButton
-          type="delete"
-          onDelete={() => handleItemDelete(id)}
-          disabled={selected}
-        />
+        <CheckboxButton isChecked={isChecked} onCheck={onCheck} />
+        <DeleteButton onDelete={() => handleItemDelete(id)} disabled={isChecked} />
       </StyledCartItemCardHeader>
       <StyledCartItemCardProductContents>
         <StyledProductImg src={imageUrl} alt="" />
@@ -83,12 +44,15 @@ export const CartItemCard: React.FC<CartItemProps> = ({
           <StyledProductName>{name}</StyledProductName>
           <StyledProductPrice>{price.toLocaleString()}원</StyledProductPrice>
           <StyledProductQuantityContainer>
-            <ActionButton
-              type="minus"
-              onMinus={() => handleItemCountMinus(id)}
+            <CounterButton
+              type={COUNTER_BUTTON_TYPES.DECREMENT}
+              onClick={() => handleItemCountMinus({ id, quantity })}
             />
             <StyledProductQuantityText>{quantity}</StyledProductQuantityText>
-            <ActionButton type="plus" onPlus={() => handleItemCountPlus(id)} />
+            <CounterButton
+              type={COUNTER_BUTTON_TYPES.INCREMENT}
+              onClick={() => handleItemCountPlus({ id, quantity })}
+            />
           </StyledProductQuantityContainer>
         </StyledProductInfo>
       </StyledCartItemCardProductContents>

@@ -14,3 +14,11 @@ export interface CartItem {
 export interface CartItemCounts {
   quantity: number;
 }
+
+export interface CartSummary {
+  orderPrice: number;
+  deliveryPrice: number;
+  totalPrice: number;
+  uniqueItemCount: number;
+  totalItemCount: number;
+}

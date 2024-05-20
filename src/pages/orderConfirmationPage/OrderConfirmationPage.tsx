@@ -1,62 +1,37 @@
-import { useEffect } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
-import { getCartItemCounts } from "../../api";
-import { ConfirmButton } from "../../components/button/confirmButton/ConfirmButton";
+import { useRecoilValue } from "recoil";
+import { ConfirmButton } from "../../components/button";
 import Header from "../../components/header/Header";
-import { cartItemsCountState } from "../../recoil/atoms/atoms";
+import { BUTTON_COLORS, HEADER_TYPES, INFO_MESSAGES } from "../../constants";
+import { cartSummarySelectorState } from "../../recoil/selector/selector";
 import {
-  categoryCountState,
-  totalPriceState,
-} from "../../recoil/selector/selector";
-import {
-  StyledConfirmationPagePriceContainer,
   StyledConfirmationPage,
   StyledConfirmationPageDescription,
   StyledConfirmationPagePrice,
+  StyledConfirmationPagePriceContainer,
   StyledConfirmationPageSubTitle,
   StyledConfirmationPageTitle,
 } from "./OrderConfirmationPage.styled";
 
 export const OrderConfirmationPage: React.FC = () => {
-  const totalPrice = useRecoilValue(totalPriceState);
-  const categoryCount = useRecoilValue(categoryCountState);
-  const [cartItemsCount, setCartItemsCount] =
-    useRecoilState(cartItemsCountState);
-
-  useEffect(() => {
-    const fetchCartItems = async () => {
-      try {
-        const { quantity } = await getCartItemCounts();
-        setCartItemsCount(quantity);
-      } catch (error) {
-        console.error("Failed to fetch cart items:", error);
-      }
-    };
-
-    fetchCartItems();
-  }, [setCartItemsCount]);
+  const { totalPrice, uniqueItemCount, totalItemCount } = useRecoilValue(cartSummarySelectorState);
 
   return (
     <>
-      <Header type="back" />
+      <Header type={HEADER_TYPES.BACK} />
       <StyledConfirmationPage>
         <StyledConfirmationPageTitle>주문확인 </StyledConfirmationPageTitle>
         <StyledConfirmationPageDescription>
           <span>
-            총 {categoryCount}종류의 상품 {cartItemsCount}개를 주문합니다.
+            총 {uniqueItemCount}종류의 상품 {totalItemCount}개를 주문합니다.
           </span>
-          <span> 최종 결제 금액을 확인해 주세요.</span>
+          <span>{INFO_MESSAGES.CHECK_TOTAL_PRICE}</span>
         </StyledConfirmationPageDescription>
         <StyledConfirmationPagePriceContainer>
-          <StyledConfirmationPageSubTitle>
-            총 결제 금액
-          </StyledConfirmationPageSubTitle>
-          <StyledConfirmationPagePrice>
-            {totalPrice.toLocaleString()}원
-          </StyledConfirmationPagePrice>
+          <StyledConfirmationPageSubTitle>총 결제 금액</StyledConfirmationPageSubTitle>
+          <StyledConfirmationPagePrice>{totalPrice.toLocaleString()}원</StyledConfirmationPagePrice>
         </StyledConfirmationPagePriceContainer>
       </StyledConfirmationPage>
-      <ConfirmButton text="결제하기" backgroundColor="rgba(190, 190, 190, 1)" />
+      <ConfirmButton text="결제하기" mode={BUTTON_COLORS.LIGHT} />
     </>
   );
 };

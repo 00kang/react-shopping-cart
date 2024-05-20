@@ -3,15 +3,10 @@ import { RecoilRoot, useRecoilState, useRecoilValue } from "recoil";
 import { mockCartItemsData } from "../../mocks/mockCartItemsData";
 import { mockChangeCountData } from "../../mocks/mockChangeCountData";
 import { mockSelectedItemsData } from "../../mocks/mockSelectedItemsData";
-import {
-  cartItemsCountState,
-  cartItemsState,
-  isAllSelectedState,
-  selectedItemsState,
-} from "./atoms";
+import { totalItemCountState, cartItemsState, isAllCheckedState, checkedItemState } from "./atoms";
 
 describe("초기값 테스트", () => {
-  it("상품 목록 조회 초기값은 빈 배열이다.", () => {
+  it("cartItemsState(상품 목록 조회)의 초기값은 빈 배열이어야 합니다.", () => {
     const { result } = renderHook(() => useRecoilState(cartItemsState), {
       wrapper: RecoilRoot,
     });
@@ -19,8 +14,8 @@ describe("초기값 테스트", () => {
     expect(result.current[0]).toEqual([]);
   });
 
-  it("상품 총 수량 초기값은 0이다. ", () => {
-    const { result } = renderHook(() => useRecoilState(cartItemsCountState), {
+  it("totalItemCountState(상품 총 수량)의 초기값은 0이어야 합니다. ", () => {
+    const { result } = renderHook(() => useRecoilState(totalItemCountState), {
       wrapper: RecoilRoot,
     });
 
@@ -29,7 +24,7 @@ describe("초기값 테스트", () => {
 });
 
 describe("mockData를 이용한 테스트", () => {
-  it("장바구니 데이터 로딩 ", () => {
+  it("cartItemsState(상품 목록 조회)에 mock 데이터를 로드하면 cartItemsState의 길이가 3이어야 합니다. ", () => {
     const { result } = renderHook(() => useRecoilState(cartItemsState), {
       wrapper: RecoilRoot,
     });
@@ -39,16 +34,14 @@ describe("mockData를 이용한 테스트", () => {
     expect(result.current[0].length).toBe(3);
   });
 
-  it("개별 상품 선택 기능", () => {
-    const { result } = renderHook(() => useRecoilState(selectedItemsState), {
+  it("checkedItemState(개병 상품 선탞)에 mock 데이터를 로드하면 선택된 상품의 수가 3개, 선택되지 않은 상품의 수가 1개이어야 합니다.", () => {
+    const { result } = renderHook(() => useRecoilState(checkedItemState), {
       wrapper: RecoilRoot,
     });
 
     act(() => result.current[1](mockSelectedItemsData.selectedItemsState));
 
-    const selectedCount = Object.values(result.current[0]).filter(
-      (value) => value === true
-    ).length;
+    const selectedCount = Object.values(result.current[0]).filter((value) => value === true).length;
 
     const unselectedCount = Object.values(result.current[0]).filter(
       (value) => value === false
@@ -58,8 +51,8 @@ describe("mockData를 이용한 테스트", () => {
     expect(unselectedCount).toBe(1);
   });
 
-  it("전체 상품 선택 기능", () => {
-    const { result } = renderHook(() => useRecoilState(isAllSelectedState), {
+  it("isAllCheckedState(전체 상품 선택)에 mock 데이터를 로드하면 isAllCheckedState가 false이어야 합니다. ", () => {
+    const { result } = renderHook(() => useRecoilState(isAllCheckedState), {
       wrapper: RecoilRoot,
     });
 
@@ -68,12 +61,12 @@ describe("mockData를 이용한 테스트", () => {
     expect(result.current[0]).toBe(false);
   });
 
-  it("수량 증가 기능", () => {
+  it("cartItemsState(상품 목록 조회)에 mock 데이터를 로드하고, 특정 아이템(429)의 수량을 증가시키면 수량이 2이어야 합니다.", () => {
     const { result } = renderHook(
       () => {
         const [cartItems, setCartItems] = useRecoilState(cartItemsState);
-        const cartItemsCount = useRecoilValue(cartItemsCountState);
-        return { cartItems, setCartItems, cartItemsCount };
+        const totalItemCount = useRecoilValue(totalItemCountState);
+        return { cartItems, setCartItems, totalItemCount };
       },
       {
         wrapper: RecoilRoot,
@@ -98,15 +91,11 @@ describe("mockData를 이용한 테스트", () => {
 
     act(() => {
       result.current.setCartItems((prevItems) =>
-        prevItems.map((item) =>
-          item.id === 429 ? { ...item, quantity: item.quantity + 1 } : item
-        )
+        prevItems.map((item) => (item.id === 429 ? { ...item, quantity: item.quantity + 1 } : item))
       );
     });
 
-    const expectedCount = result.current.cartItems.find(
-      (item) => item.id === 429
-    );
+    const expectedCount = result.current.cartItems.find((item) => item.id === 429);
 
     if (expectedCount) {
       expect(expectedCount.quantity).toBe(2);
