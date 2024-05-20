@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { getCartItems } from "../../api";
 import { ConfirmButton } from "../../components/button";
 import { CartContentSection } from "../../components/cartContentSection/CartContentSection";
