@@ -3,8 +3,8 @@ import { RecoilRoot, useRecoilState, useRecoilValue } from "recoil";
 import { mockCartItemsData } from "../../mocks/mockCartItemsData";
 import { mockChangeCountData } from "../../mocks/mockChangeCountData";
 import { mockSelectedItemsData } from "../../mocks/mockSelectedItemsData";
-import { cartItemsState, isAllCheckedState, checkedItemState } from "./atoms";
 import { cartSummarySelectorState } from "../selector/selector";
+import { cartItemsState, checkedItemState, isAllCheckedState } from "./atoms";
 
 describe("초기값 테스트", () => {
   it("cartItemsState(상품 목록 조회)의 초기값은 빈 배열이어야 합니다.", () => {

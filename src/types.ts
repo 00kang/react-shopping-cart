@@ -17,8 +17,25 @@ export interface CartItemCounts {
 
 export interface CartSummary {
   orderPrice: number;
-  deliveryPrice: number;
-  totalPrice: number;
+  cartDeliveryPrice: number;
+  orderDeliveryPrice: number;
+  cartTotalPrice: number;
+  orderTotalPrice: number;
   uniqueItemCount: number;
   totalItemCount: number;
+}
+export interface Coupon {
+  id: number;
+  code: string;
+  description: string;
+  expirationDate: string;
+  discount?: number;
+  discountType: "fixed" | "percentage" | "buyXgetY" | "freeShipping";
+  minimumAmount?: number;
+  buyQuantity?: number;
+  getQuantity?: number;
+  availableTime?: {
+    start: string;
+    end: string;
+  };
 }
