@@ -1,4 +1,5 @@
 import { Coupon } from "../types";
+import { isMinimumAmountSatisfied, isWithinAvailableTime } from "../utils/couponChecker";
 import { couponValidator } from "../utils/couponValidator";
 import { useCouponFinder } from "./useCouponFinder";
 
@@ -10,38 +11,12 @@ export const useCouponApplicabilityChecker = () => {
     const targetCoupon = findCouponByCode(coupon.code);
     if (!targetCoupon || !isCouponValid(targetCoupon)) return false;
 
-    if (targetCoupon.minimumAmount && totalAmount < targetCoupon.minimumAmount) {
+    if (!isMinimumAmountSatisfied(targetCoupon, totalAmount)) {
       return false;
     }
 
-    if (targetCoupon.availableTime) {
-      const [startHour, startMinute, startSecond] = targetCoupon.availableTime.start
-        .split(":")
-        .map(Number);
-
-      const [endHour, endMinute, endSecond] = targetCoupon.availableTime.end.split(":").map(Number);
-
-      const startTime = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-        startHour,
-        startMinute,
-        startSecond
-      );
-
-      const endTime = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-        endHour,
-        endMinute,
-        endSecond
-      );
-
-      if (now < startTime || now > endTime) {
-        return false;
-      }
+    if (!isWithinAvailableTime(targetCoupon, now)) {
+      return false;
     }
 
     return true;

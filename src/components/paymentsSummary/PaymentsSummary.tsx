@@ -1,6 +1,7 @@
 import { useRecoilValue } from "recoil";
 import { INFO_MESSAGES } from "../../constants";
 import { cartSummarySelectorState } from "../../recoil/selector/selector";
+import { formatPrice } from "../../utils/formatPrice";
 import {
   StyledConfirmationPage,
   StyledConfirmationPageDescription,
@@ -9,10 +10,13 @@ import {
   StyledConfirmationPageSubTitle,
   StyledConfirmationPageTitle,
 } from "./PaymentsSummary.styled";
+import { useTotalDiscount } from "../../hooks/useTotalDiscount";
 
 export const PaymentsSummary: React.FC = () => {
   const { orderTotalPrice, uniqueItemCount, totalItemCount } =
     useRecoilValue(cartSummarySelectorState);
+  const totalDiscountPrice = useTotalDiscount();
+  const orderTotalPriceFinal = orderTotalPrice - totalDiscountPrice;
 
   return (
     <StyledConfirmationPage>
@@ -26,7 +30,7 @@ export const PaymentsSummary: React.FC = () => {
       <StyledConfirmationPagePriceContainer>
         <StyledConfirmationPageSubTitle>총 결제 금액</StyledConfirmationPageSubTitle>
         <StyledConfirmationPagePrice>
-          {orderTotalPrice.toLocaleString()}원
+          {formatPrice(orderTotalPriceFinal)}원
         </StyledConfirmationPagePrice>
       </StyledConfirmationPagePriceContainer>
     </StyledConfirmationPage>
